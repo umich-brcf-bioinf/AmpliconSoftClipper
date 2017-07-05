@@ -6,19 +6,21 @@ from collections import defaultdict
 import os
 
 import pysam
+from pysam.utils import PysamDispatcher
 
 
 # I would rather just say pysam.index(...), but since that global is
 # added dynamically, Eclipse flags this as a compilation problem. So
-# instead we connect directly to the pysam.SamtoolsDispatcher.
+# instead we connect directly to the pysam.utils.PysamDispatcher.
 def pysam_index(input_filename):
-    pysam.SamtoolsDispatcher("index", None).__call__(input_filename,
-                                                     catch_stdout=False)
+    PysamDispatcher("samtools", "index", None).__call__(input_filename,
+                                                        catch_stdout=False)
 
 def pysam_sort(input_filename, output_prefix):
-    pysam.SamtoolsDispatcher("sort", None).__call__(input_filename,
-                                                    output_prefix,
-                                                    catch_stdout=False)
+    PysamDispatcher("samtools", "sort", None).__call__('-o',
+                                                       output_prefix + '.bam',
+                                                       input_filename,
+                                                       catch_stdout=False)
 
 
 class _BaseReadHandler(object):

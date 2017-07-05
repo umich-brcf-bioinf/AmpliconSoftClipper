@@ -6,6 +6,7 @@ import resource
 import sys
 
 import pysam
+from pysam.utils import PysamDispatcher
 from testfixtures.tempdirectory import TempDirectory
 
 from katana import clipper, readhandler
@@ -359,14 +360,14 @@ class ClipperFunctionalTestCase(KatanaBaseTestCase):
             new_file.write(contents)
             new_file.flush()
         return filename
-    
+
     @staticmethod
     def _bam_to_sam(bam_filename):
         stdout_orig = sys.stdout
         try:
             sys.stdout = sys.__stdout__
-            view = pysam.SamtoolsDispatcher("view", None).__call__
-            return [x for x in view(bam_filename)]
+            view = PysamDispatcher("samtools", "view", None).__call__
+            return [x for x in view(bam_filename, split_lines=True)]
         finally:
             sys.stdout = stdout_orig
 
